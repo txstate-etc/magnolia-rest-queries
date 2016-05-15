@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module SYSTEM "module.dtd" >
+<module>
+  <name>rest-queries</name>
+  <displayName>REST endpoint for JCR queries</displayName>
+	<class>edu.txstate.its.gato.RestQueries</class>
+  <versionHandler>edu.txstate.its.gato.setup.RestQueriesVersionHandler</versionHandler>
+  <version>${project.version}</version>
+</module>
