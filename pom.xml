@@ -9,7 +9,7 @@
   </parent>
   <groupId>edu.txstate.its.gato</groupId>
   <artifactId>rest-queries</artifactId>
-  <version>1.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <name>REST endpoint for JCR queries</name>
   
 	<properties>
