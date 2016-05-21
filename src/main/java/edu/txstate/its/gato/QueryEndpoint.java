@@ -85,7 +85,7 @@ public class QueryEndpoint<D extends QueryEndpointDefinition> extends AbstractEn
 
     try {
       NodeIterator nodes = QueryUtil.search(workspaceName, query, lang);
-      List<RepositoryNode> ret = new ArrayList<RepositoryNode>();
+      RepositoryNodeList ret = new RepositoryNodeList();
       while (nodes.hasNext()) {
         Node n = nodes.nextNode();
         if (StringUtils.isBlank(hasPermissions) || n.getSession().hasPermission(n.getPath(), hasPermissions)) {
