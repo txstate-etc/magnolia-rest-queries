@@ -74,6 +74,7 @@ public class QueryEndpoint<D extends QueryEndpointDefinition> extends AbstractEn
       @QueryParam("depth") @DefaultValue("0") int depth,
       @QueryParam("query") @DefaultValue("") String query,
       @QueryParam("excludeNodeTypes") @DefaultValue("") String excludeNodeTypes,
+      @QueryParam("hasPermissions") @DefaultValue("") String hasPermissions,
       @QueryParam("includeMetadata") @DefaultValue("false") boolean includeMetadata) throws RepositoryException {
 
     if (StringUtils.isBlank(query))
@@ -87,9 +88,11 @@ public class QueryEndpoint<D extends QueryEndpointDefinition> extends AbstractEn
       List<RepositoryNode> ret = new ArrayList<RepositoryNode>();
       while (nodes.hasNext()) {
         Node n = nodes.nextNode();
-        ret.add(
-          marshaller.marshallNode(n, depth, splitExcludeNodeTypesString(excludeNodeTypes), includeMetadata)
-        );
+        if (StringUtils.isBlank(hasPermissions) || n.getSession().hasPermission(n.getPath(), hasPermissions)) {
+          ret.add(
+            marshaller.marshallNode(n, depth, splitExcludeNodeTypesString(excludeNodeTypes), includeMetadata)
+          );
+        }
       }
 
       return Response.ok(ret).build();
