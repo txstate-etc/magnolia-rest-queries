@@ -1,6 +1,6 @@
 package edu.txstate.its.gato;
 
-import info.magnolia.cms.util.QueryUtil;
+import info.magnolia.context.MgnlContext;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.service.node.v1.RepositoryMarshaller;
 import info.magnolia.rest.service.node.v1.RepositoryNode;
@@ -11,7 +11,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
+import javax.jcr.query.QueryResult;
+import javax.jcr.query.RowIterator;
 import javax.jcr.RepositoryException;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -84,10 +85,13 @@ public class QueryEndpoint<D extends QueryEndpointDefinition> extends AbstractEn
       return Response.status(Response.Status.BAD_REQUEST).build();
 
     try {
-      NodeIterator nodes = QueryUtil.search(workspaceName, query, lang);
+      QueryResult qr = MgnlContext.getJCRSession(workspaceName).getWorkspace()
+        .getQueryManager().createQuery(query, lang).execute();
+      String[] cols = qr.getSelectorNames();
+      RowIterator rows = qr.getRows();
       RepositoryNodeList ret = new RepositoryNodeList();
-      while (nodes.hasNext()) {
-        Node n = nodes.nextNode();
+      while (rows.hasNext()) {
+        Node n = rows.nextRow().getNode(cols[0]);
         if (StringUtils.isBlank(hasPermissions) || n.getSession().hasPermission(n.getPath(), hasPermissions)) {
           ret.add(
             marshaller.marshallNode(n, depth, splitExcludeNodeTypesString(excludeNodeTypes), includeMetadata)
