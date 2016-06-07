@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
+import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.RowIterator;
 import javax.jcr.RepositoryException;
@@ -74,6 +75,8 @@ public class QueryEndpoint<D extends QueryEndpointDefinition> extends AbstractEn
       @PathParam("lang") @DefaultValue("JCR-SQL2") String lang,
       @QueryParam("depth") @DefaultValue("0") int depth,
       @QueryParam("query") @DefaultValue("") String query,
+      @QueryParam("limit") @DefaultValue("0") long limit,
+      @QueryParam("offset") @DefaultValue("0") long offset,
       @QueryParam("excludeNodeTypes") @DefaultValue("") String excludeNodeTypes,
       @QueryParam("hasPermissions") @DefaultValue("") String hasPermissions,
       @QueryParam("includeMetadata") @DefaultValue("false") boolean includeMetadata) throws RepositoryException {
@@ -85,8 +88,11 @@ public class QueryEndpoint<D extends QueryEndpointDefinition> extends AbstractEn
       return Response.status(Response.Status.BAD_REQUEST).build();
 
     try {
-      QueryResult qr = MgnlContext.getJCRSession(workspaceName).getWorkspace()
-        .getQueryManager().createQuery(query, lang).execute();
+      Query q = MgnlContext.getJCRSession(workspaceName).getWorkspace()
+        .getQueryManager().createQuery(query, lang);
+      if (limit > 0) q.setLimit(limit);
+      if (offset > 0) q.setOffset(offset);
+      QueryResult qr = q.execute();
       String[] cols = qr.getSelectorNames();
       RowIterator rows = qr.getRows();
       RepositoryNodeList ret = new RepositoryNodeList();
